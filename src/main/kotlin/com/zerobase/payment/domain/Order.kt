@@ -12,10 +12,10 @@ class Order(
     val paymentUser: PaymentUser,
 
     @Enumerated(EnumType.STRING)
-    val orderStatus: OrderStatus,
+    var orderStatus: OrderStatus,
 
     val orderTitle: String,
     val orderAmount: Long,
-    var paidAmount: Long, // 결제된 금액
-    var refundedAmount: Long // 환불된 금액
+    var paidAmount: Long = 0, // 결제된 금액
+    var refundedAmount: Long = 0 // 환불된 금액
 ) : BaseEntity()
