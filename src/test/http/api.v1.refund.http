@@ -1,0 +1,10 @@
+### 환불 요청
+POST http://localhost:8090/api/v1/refund
+Content-Type: application/json
+
+{
+  "transactionId": "PT5dcadece975d466ca95746ea8a61357e",
+  "refundId": "{{$uuid}}",
+  "refundAmount": 2000,
+  "refundReason": "필요 없음"
+}

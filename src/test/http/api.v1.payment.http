@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "payUserId": "p1",
-  "amount": 1000,
+  "amount": 2000,
   "merchantTransactionId": "{{$uuid}}",
-  "orderTitle": "빨간 레이스가 달린 뾰족 구두"
+  "orderTitle": "파란 뿔테 안경"
 }

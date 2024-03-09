@@ -33,7 +33,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.13.3") // mockk
     testImplementation("com.ninja-squad:springmockk:4.0.0") // mockk를 spring에서 사용하기 위한 라이브러리
-    testImplementation("io.kotest:kotest-runner-junit5:5.5.4") // kotest
+    testImplementation("io.kotest:kotest-assertions-core:5.5.4") // kotest assertion
+    testImplementation("io.kotest:kotest-runner-junit5:5.5.4") // kotest (assertion이 이미 포함되어 있음)
 }
 
 dependencyManagement {

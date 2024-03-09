@@ -3,16 +3,13 @@ package com.zerobase.payment.service
 import com.zerobase.payment.OrderStatus
 import com.zerobase.payment.OrderStatus.*
 import com.zerobase.payment.TransactionStatus.*
-import com.zerobase.payment.TransactionType.PAYMENT
 import com.zerobase.payment.TransactionType.REFUND
 import com.zerobase.payment.domain.Order
 import com.zerobase.payment.domain.OrderTransaction
 import com.zerobase.payment.exception.ErrorCode
 import com.zerobase.payment.exception.ErrorCode.*
 import com.zerobase.payment.exception.PaymentException
-import com.zerobase.payment.repository.OrderRepository
 import com.zerobase.payment.repository.OrderTransactionRepository
-import com.zerobase.payment.repository.PaymentRepositories
 import com.zerobase.payment.util.generateRefundTransactionId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,8 +20,6 @@ import java.time.LocalDateTime
  */
 @Service
 class RefundStatusService(
-    private val paymentRepositories: PaymentRepositories,
-    private val orderRepository: OrderRepository,
     private val orderTransactionRepository: OrderTransactionRepository
 ) {
     @Transactional
@@ -35,16 +30,15 @@ class RefundStatusService(
         refundReason: String,
     ): Long {
         // 결제(orderTransaction) 확인
-        // 환불이 가능한지 확인
-        // 환불 트랜잭션(orderTransaction) 저장
         val originalTransaction =
             orderTransactionRepository.findByTransactionId(originalTransactionId)
                 ?: throw PaymentException(ORDER_NOT_FOUND)
 
+        // 환불이 가능한지 확인
         val order = originalTransaction.order
-
         validationRefund(order, refundAmount)
 
+        // 환불 트랜잭션(orderTransaction) 저장
         return orderTransactionRepository.save(
             OrderTransaction(
                 transactionId = generateRefundTransactionId(),
@@ -111,27 +105,15 @@ class RefundStatusService(
             .sumOf { it.transactionAmount } // filter한 값의 sum
 
     fun saveAsFailure(
-        orderId: Long,
+        refundTxId: Long,
         errorCode: ErrorCode
     ) {
-        val order: Order = getOrderByOrderId(orderId).apply {
-            orderStatus = OrderStatus.FAILED
-        }
-
-        getFirstOrderTransactionByOrder(order).apply {
-            transactionStatus = FAILURE
-            failureCode = errorCode.name
-            description = errorCode.errorMessage
-        }
+        orderTransactionRepository.findById(refundTxId)
+            .orElseThrow { throw PaymentException(INTERNAL_SERVER_ERROR) }
+            .apply {
+                transactionStatus = FAILURE
+                failureCode = errorCode.name
+                description = errorCode.errorMessage
+            }
     }
-
-    private fun getFirstOrderTransactionByOrder(order: Order) =
-        orderTransactionRepository.findByOrderAndTransactionType(
-            order = order,
-            transactionType = PAYMENT
-        ).first()
-
-    private fun getOrderByOrderId(orderId: Long): Order =
-        orderRepository.findById(orderId)
-            .orElseThrow { throw PaymentException(ErrorCode.ORDER_NOT_FOUND) }
 }

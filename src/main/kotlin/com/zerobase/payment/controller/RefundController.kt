@@ -43,7 +43,7 @@ data class RefundResponse(
 
 data class RefundRequest(
     val transactionId: String,
-    val refundId: Long,
+    val refundId: String,
     val refundAmount: Long,
     val refundReason: String
 ) {

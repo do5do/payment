@@ -39,9 +39,7 @@ class RefundService(
             )
         } catch (e: Exception) {
             // 실패 : 거래를 실패로 저장 -> 실패 사유를 같이 저장해야 함
-            val errorCode = getErrorCode(e)
-            refundStatusService.saveAsFailure(refundTxId, errorCode)
-
+            refundStatusService.saveAsFailure(refundTxId, getErrorCode(e))
             throw e
         }
     }
